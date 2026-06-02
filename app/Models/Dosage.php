@@ -3,8 +3,8 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Temp;            // ✅ ajouté
-use App\Models\PriseMedicament; // ✅ ajouté
+use App\Models\Temp;           
+use App\Models\PriseMedicament; 
 
 
 class Dosage extends Model
@@ -30,7 +30,7 @@ class Dosage extends Model
         return $this->hasMany(PriseMedicament::class);
     }
 
-    /** Génère toutes les prises prévues selon la durée et les temps donnés */
+  //tous les prises selon la duree et le temps
     public function genererPrises(array $tempsIds): void
     {
         $debut = $this->ordonnance->date_prescription;

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdatePatientRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $patient = $this->route('patient');
+
+        return [
+            'nom' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
+            'prenom' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($patient?->user_id)],
+            'telephone' => ['required', 'string', 'regex:/^(\+212|0)[5-7][0-9]{8}$/'],
+            'lien' => ['required', 'in:fils,fille,epoux,epouse,pere,mere,frere,soeur,infirmier,autre'],
+            'etat' => ['required', 'in:actif,inactif,gueri'],
+            'date_naissance' => ['nullable', 'date', 'before:today'],
+            'medecin_id' => ['nullable', 'exists:medecins,id'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return (new StorePatientRequest())->messages() + [
+            'etat.required' => 'L etat est obligatoire.',
+            'etat.in' => 'L etat selectionne est invalide.',
+        ];
+    }
+}

@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-     // Cardinalité : User(responsable) 1 ──── 0..N PatientResponsable
-    //              Patient            1 ──── 0..N PatientResponsable
-    // => Un responsable suit plusieurs patients
-    // => Un patient peut avoir eu plusieurs responsables (historique)
-    // => Mais un seul responsable ACTIF à la fois (actif = true)
 
     public function up(): void
     {

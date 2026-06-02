@@ -1,0 +1,52 @@
+export const colors = {
+    navy: '#12355B',
+    navyDeep: '#0B243F',
+    blue: '#2D6CDF',
+    teal: '#10B981',
+    mint: '#DFF7EF',
+    red: '#EF4444',
+    amber: '#F59E0B',
+    violet: '#7C3AED',
+    page: '#F4F8FB',
+    panel: '#FFFFFF',
+    panelSoft: '#F8FBFD',
+    line: '#DDE7EF',
+    text: '#172033',
+    muted: '#667085',
+};
+
+export const ui = {
+    card: {
+        backgroundColor: colors.panel,
+        border: `1px solid ${colors.line}`,
+        borderRadius: 10,
+        boxShadow: '0 10px 24px rgba(18, 53, 91, 0.07)',
+    },
+    input: {
+        width: '100%',
+        padding: '10px 12px',
+        border: `1.5px solid ${colors.line}`,
+        borderRadius: 8,
+        fontSize: 14,
+        boxSizing: 'border-box',
+        backgroundColor: colors.panel,
+        color: colors.text,
+        outline: 'none',
+    },
+    label: {
+        display: 'block',
+        fontSize: 12,
+        color: colors.muted,
+        fontWeight: 800,
+        marginBottom: 6,
+    },
+    primaryButton: {
+        backgroundColor: colors.navy,
+        color: colors.panel,
+        border: 'none',
+        borderRadius: 8,
+        padding: '10px 16px',
+        fontWeight: 800,
+        cursor: 'pointer',
+    },
+};

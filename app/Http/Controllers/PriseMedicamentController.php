@@ -1,61 +1,62 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\PriseMedicament;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
 class PriseMedicamentController extends Controller
 {
-    /** Programme du jour du patient connecté */
-  public function index()
-{
-    $patient = auth()->user()->patient;
-    $patient->load('medecin');
+    public function index()
+    {
+        $patient = auth()->user()->patient;
+        if (! $patient) {
+            return Inertia::render('Patient/Dashboard', [
+                'prises'        => [],
+                'adherence'     => 0,
+                'medecin'       => null,
+                'prochainePrise'=> null,
+                'avertissement' => 'Votre compte patient n\'est pas encore configuré. Contactez votre responsable.',
+            ]);
+        }
 
-    $prises = PriseMedicament::with(['dosage.medicament', 'temps'])
-        ->where('patient_id', $patient->id)
-        ->whereDate('date_prevue', today())
-        ->orderBy('heure_prevue')
-        ->get()
-        ->map(fn($p) => [
-            'id'            => $p->id,
-            'medicament'    => $p->dosage->medicament->nom_commercial,
-            'forme'         => $p->dosage->medicament->forme,
-            'photo_boite'   => $p->dosage->medicament->photo_boite,
-            'quantite'      => $p->dosage->quantite . ' ' . $p->dosage->quantite_unite,
-            'temps'         => $p->temps->nom,
-            'heure_prevue'  => substr($p->heure_prevue, 0, 5),
-            'statut'        => $p->statut,
-        ]);
+        $patient->load('medecin');
 
-    $adherence = $patient->tauxAdherence();
+        $prises = PriseMedicament::with(['dosage.medicament', 'temps'])
+            ->where('patient_id', $patient->id)
+            ->whereDate('date_prevue', today())
+            ->orderBy('heure_prevue')
+            ->get()
+            ->map(fn($p) => [
+                'id'            => $p->id,
+                'medicament'    => $p->dosage->medicament->nom_commercial,
+                'forme'         => $p->dosage->medicament->forme,
+                'photo_boite'   => $p->dosage->medicament->photo_boite,
+                'quantite'      => $p->dosage->quantite . ' ' . $p->dosage->quantite_unite,
+                'temps'         => $p->temps->nom,
+                'heure_prevue'  => substr($p->heure_prevue, 0, 5),
+                'statut'        => $p->statut,
+            ]);
 
-    $medecin = $patient->medecin ? [
-        'nom'        => $patient->medecin->nom,
-        'prenom'     => $patient->medecin->prenom,
-        'specialite' => $patient->medecin->specialite,
-        'telephone'  => $patient->medecin->telephone,
-    ] : null;
+        $adherence = $patient->tauxAdherence();
 
-    $prochainePrise = $prises->firstWhere('statut', 'en_attente');
+        $medecin = $patient->medecin ? [
+            'nom'        => $patient->medecin->nom,
+            'prenom'     => $patient->medecin->prenom,
+            'specialite' => $patient->medecin->specialite,
+            'telephone'  => $patient->medecin->telephone,
+        ] : null;
 
-    return Inertia::render('Patient/Dashboard', compact('prises', 'adherence', 'medecin', 'prochainePrise'));
-}
+        $prochainePrise = $prises->firstWhere('statut', 'en_attente');
 
-    /** Patient confirme une prise */
+        return Inertia::render('Patient/Dashboard', compact('prises', 'adherence', 'medecin', 'prochainePrise'));
+    }
     public function confirmer(PriseMedicament $prise)
     {
         abort_unless($prise->patient_id === auth()->user()->patient?->id, 403);
-
         $prise->confirmer();
 
-        // Diminuer le stock du médicament
         $medicament = $prise->dosage->medicament;
         $medicament->decrement('quantite_stock');
 
-        // Notification de confirmation
         \App\Models\Notification::create([
             'user_id' => auth()->id(),
             'type'    => 'confirmation',
@@ -66,8 +67,6 @@ class PriseMedicamentController extends Controller
 
         return redirect()->back()->with('success', 'Prise confirmée !');
     }
-
-    /** Responsable — historique de toutes les prises de ses patients */
     public function historique()
     {
         $responsable = auth()->user();

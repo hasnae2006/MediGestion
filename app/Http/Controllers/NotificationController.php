@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Http\Requests\SendNotificationRequest;
 use App\Models\Notification;
 use App\Models\Patient;
 use Illuminate\Http\Request;
@@ -35,15 +36,9 @@ class NotificationController extends Controller
         return redirect()->back()->with('success', 'Notification supprimée.');
     }
 
-    // Responsable envoie une notification à un patient
-    public function send(Request $request)
+    public function send(SendNotificationRequest $request)//le respo envoyer des notifs a patie
     {
-        $data = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'type'       => 'required|in:rappel,info,alerte,message',
-            'titre'      => 'required|string|max:150',
-            'message'    => 'required|string|max:500',
-        ]);
+        $data = $request->validated();
 
         $patient = Patient::with('user')->findOrFail($data['patient_id']);
 

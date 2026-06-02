@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->enum('lien',['fils','fille',  'epoux', 'epouse', 'pere', 'mere', 'frere', 'soeur','infirmier','autre'])->default('autre');
             $table->enum('etat', ['actif', 'inactif', 'gueri'])->default('actif');
-            // "gueri" = traitement terminé, plus de prises actives
             $table->timestamps();
         });
     }

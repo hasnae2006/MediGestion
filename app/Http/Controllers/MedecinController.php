@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MedecinRequest;
 use App\Models\Medecin;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class MedecinController extends Controller
@@ -14,28 +14,16 @@ class MedecinController extends Controller
         return Inertia::render('Responsable/Medecins', compact('medecins'));
     }
 
-    public function store(Request $request)
+    public function store(MedecinRequest $request)
     {
-        $data = $request->validate([
-            'nom'        => 'required|string|max:100',
-            'prenom'     => 'required|string|max:100',
-            'specialite' => 'required|string|max:150',
-            'telephone'  => 'required|string|max:20',
-            'email'      => 'required|email|unique:medecins,email',
-        ]);
+        $data = $request->validated();
         Medecin::create($data);
         return redirect()->back()->with('success', 'Médecin ajouté.');
     }
 
-    public function update(Request $request, Medecin $medecin)
+    public function update(MedecinRequest $request, Medecin $medecin)
     {
-        $data = $request->validate([
-            'nom'        => 'required|string|max:100',
-            'prenom'     => 'required|string|max:100',
-            'specialite' => 'required|string|max:150',
-            'telephone'  => 'required|string|max:20',
-            'email'      => 'required|email|unique:medecins,email,' . $medecin->id,
-        ]);
+        $data = $request->validated();
         $medecin->update($data);
         return redirect()->back()->with('success', 'Médecin mis à jour.');
     }

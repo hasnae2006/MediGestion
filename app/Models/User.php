@@ -11,21 +11,9 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
      protected $fillable = [
         'nom', 'prenom', 'telephone', 'email', 'role', 'password',
     ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
    protected $hidden = ['password', 'remember_token'];
 
     /**
@@ -40,41 +28,38 @@ class User extends Authenticatable
             'password'          => 'hashed',
         ];
     }
-    // ─── Relations ────────────────────────────────────────────
 
-    /** Le compte patient lié (si role = patient) */
+    // Le compte patient lié le role est egale patient
     public function patient()
     {
         return $this->hasOne(Patient::class);
     }
 
-    /** Patients dont cet user est responsable (table pivot) */
-    public function patientsGeres()
+    public function patientsGeres() //pivot
     {
         return $this->belongsToMany(Patient::class, 'patient_responsable', 'responsable_id', 'patient_id')
                     ->withPivot(['date_debut', 'date_fin', 'actif'])
                     ->withTimestamps();
     }
 
-    /** Ordonnances créées par ce responsable */
     public function ordonnances()
     {
         return $this->hasMany(Ordonnance::class, 'responsable_id');
     }
 
-    /** Notifications de cet utilisateur */
+    // Notifications de cet utilisateur
     public function notifications()
     {
         return $this->hasMany(Notification::class);
     }
 
-    /** Alertes SOS reçues (si responsable) */
+    // Alertes SOS reçues (si responsable) 
     public function sosAlertesRecues()
     {
         return $this->hasMany(SosAlerte::class, 'responsable_id');
     }
 
-    // ─── Scopes ───────────────────────────────────────────────
+    //Scopes
 
     public function scopeResponsables($query)
     {
@@ -86,7 +71,7 @@ class User extends Authenticatable
         return $query->where('role', 'patient');
     }
 
-    // ─── Helpers ──────────────────────────────────────────────
+    //Helpers
 
     public function isResponsable(): bool
     {

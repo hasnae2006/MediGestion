@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MedicamentRequest;
+use App\Http\Requests\ReapprovisionnerMedicamentRequest;
 use App\Models\Medicament;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class MedicamentController extends Controller
 {
@@ -16,31 +18,37 @@ class MedicamentController extends Controller
             'forme'          => $m->forme,
             'quantite_stock' => $m->quantite_stock,
             'stock_faible'   => $m->stockFaible(),
+            'photo_boite'    => $m->photo_boite,
         ]);
 
         return Inertia::render('Responsable/Medicaments', compact('medicaments'));
     }
 
-    public function store(Request $request)
+    public function store(MedicamentRequest $request)
     {
-        $data = $request->validate([
-            'nom_commercial' => 'required|string|max:200',
-            'forme'          => 'required|in:comprime,sirop,injectable,capsule,autre',
-            'quantite_stock' => 'required|integer|min:0',
-        ]);
+        $data = $request->validated();
+
+        if ($request->hasFile('photo_boite')) {
+            $data['photo_boite'] = $request->file('photo_boite')
+                ->store('medicaments', 'public');
+        }
 
         Medicament::create($data);
 
         return redirect()->back()->with('success', 'Médicament ajouté.');
     }
 
-    public function update(Request $request, Medicament $medicament)
+    public function update(MedicamentRequest $request, Medicament $medicament)
     {
-        $data = $request->validate([
-            'nom_commercial' => 'required|string|max:200',
-            'forme'          => 'required|in:comprime,sirop,injectable,capsule,autre',
-            'quantite_stock' => 'required|integer|min:0',
-        ]);
+        $data = $request->validated();
+
+        if ($request->hasFile('photo_boite')) {
+            if ($medicament->photo_boite) {
+                Storage::disk('public')->delete($medicament->photo_boite);
+            }
+            $data['photo_boite'] = $request->file('photo_boite')
+                ->store('medicaments', 'public');
+        }
 
         $medicament->update($data);
 
@@ -49,18 +57,19 @@ class MedicamentController extends Controller
 
     public function destroy(Medicament $medicament)
     {
+        if ($medicament->photo_boite) {
+            Storage::disk('public')->delete($medicament->photo_boite);
+        }
+
         $medicament->delete();
 
         return redirect()->back()->with('success', 'Médicament supprimé.');
     }
 
-    /** PATCH /medicaments/{id}/stock — Réapprovisionner */
-    public function reapprovisionner(Request $request, Medicament $medicament)
+    // PATCH /medicaments/{id}/stock — Réapprovisionner 
+    public function reapprovisionner(ReapprovisionnerMedicamentRequest $request, Medicament $medicament)
     {
-        $data = $request->validate([
-            'quantite' => 'required|integer|min:1',
-        ]);
-
+        $data = $request->validated();
         $medicament->increment('quantite_stock', $data['quantite']);
 
         return redirect()->back()->with('success', 'Stock mis à jour.');

@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+use App\Http\Requests\StorePatientRequest;
+use App\Http\Requests\UpdatePatientRequest;
 use App\Models\Medecin;
 use App\Models\Patient;
 use App\Models\User;
@@ -41,18 +43,9 @@ class PatientController extends Controller
         return Inertia::render('Responsable/Patients', compact('patients', 'medecins'));
     }
 
-    public function store(Request $request)
+    public function store(StorePatientRequest $request)
     {
-        $data = $request->validate([
-            'nom'            => 'required|string|max:100',
-            'prenom'         => 'required|string|max:100',
-            'email'          => 'required|email|unique:users,email',
-            'telephone'      => 'required|string|max:20',
-            'password'       => 'required|string|min:8|confirmed',
-            'lien'           => 'required|in:fils,fille,epoux,epouse,pere,mere,frere,soeur,infirmier,autre',
-            'date_naissance' => 'nullable|date',
-            'medecin_id'     => 'nullable|exists:medecins,id',
-        ]);
+        $data = $request->validated();
 
         $user = User::create([
             'nom'       => $data['nom'],
@@ -79,18 +72,9 @@ class PatientController extends Controller
         return redirect()->back()->with('success', 'Patient ajouté avec succès.');
     }
 
-    public function update(Request $request, Patient $patient)
+    public function update(UpdatePatientRequest $request, Patient $patient)
     {
-        $data = $request->validate([
-            'nom'            => 'required|string|max:100',
-            'prenom'         => 'required|string|max:100',
-            'email'          => "required|email|unique:users,email,{$patient->user_id}",
-            'telephone'      => 'required|string|max:20',
-            'lien'           => 'required|in:fils,fille,epoux,epouse,pere,mere,frere,soeur,infirmier,autre',
-            'etat'           => 'required|in:actif,inactif,gueri',
-            'date_naissance' => 'nullable|date',
-            'medecin_id'     => 'nullable|exists:medecins,id',
-        ]);
+        $data = $request->validated();
 
         $patient->user->update([
             'nom'       => $data['nom'],

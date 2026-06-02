@@ -39,7 +39,7 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
 
         return array_merge(parent::share($request), [
-            // Infos utilisateur courant
+            // Infos utilisateur
             'auth' => [
                 'user' => $user ? [
                     'id'     => $user->id,
@@ -49,19 +49,17 @@ class HandleInertiaRequests extends Middleware
                     'role'   => $user->role,
                 ] : null,
             ],
-
-            // Flash messages (Toast dans React)
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),
             ],
 
-            // Compteur de notifications non lues
+            // des notifs non lues
             'notificationsCount' => $user
                 ? $user->notifications()->where('lu', false)->count()
                 : 0,
 
-            // Compteur alertes SOS non traitées (responsable seulement)
+            // les alertes SOS non traitées par le respo
             'alertesCount' => $user && $user->isResponsable()
                 ? \App\Models\SosAlerte::where('responsable_id', $user->id)
                     ->whereIn('statut', ['envoye', 'lu'])

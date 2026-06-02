@@ -6,12 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-     // Cardinalité :
-    //   Patient 1 ──── 0..N SosAlerte  (un patient envoie 0 ou plusieurs SOS)
-    //   User    1 ──── 0..N SosAlerte  (un responsable reçoit 0 ou plusieurs SOS)
-    //
-    // IMPORTANT : responsable_id est rempli automatiquement depuis
-    // la table patient_responsable (via SosAlerteService)
 
     public function up(): void
     {

@@ -16,62 +16,47 @@ class Patient extends Model
     protected $casts = [
         'date_naissance' => 'date',
     ];
-
-    // ─── Relations ────────────────────────────────────────────
-
-    /** Compte utilisateur lié */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /** Responsables (historique via pivot) */
-    public function responsables()
+   
+    public function responsables() //historique via pivot
     {
         return $this->belongsToMany(User::class, 'patient_responsable', 'patient_id', 'responsable_id')
                     ->withPivot(['date_debut', 'date_fin', 'actif'])
                     ->withTimestamps();
     }
 
-    /** Responsable actuellement actif */
     public function responsableActif()
     {
         return $this->responsables()->wherePivot('actif', true)->first();
     }
-
-    /** Ordonnances */
     public function ordonnances()
     {
         return $this->hasMany(Ordonnance::class);
     }
-
-    /** Prises de médicaments */
     public function priseMedicaments()
     {
         return $this->hasMany(PriseMedicament::class);
     }
-
-    /** Alertes SOS envoyées */
     public function sosAlertes()
     {
         return $this->hasMany(SosAlerte::class);
     }
 
-    // ─── Scopes ───────────────────────────────────────────────
-
-    public function scopeActifs($query)
+    public function scopeActifs($query) //Scopes
     {
         return $query->where('etat', 'actif');
     }
 
-    // ─── Helpers ──────────────────────────────────────────────
-
-    public function nomComplet(): string
+    public function nomComplet(): string //helper
     {
         return $this->user?->nomComplet() ?? 'Inconnu';
     }
 
-    /** Taux d'adhérence : % de prises confirmées sur les 30 derniers jours */
+    // TauxAdh de prises confirmées sur les 30 derniers jours 
     public function tauxAdherence(): int
     {
         $total = $this->priseMedicaments()

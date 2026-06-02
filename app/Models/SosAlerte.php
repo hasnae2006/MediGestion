@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class SosAlerte extends Model
 {    /** @use HasFactory<\Database\Factories\SosAlerteFactory> */
     use HasFactory;
-    // ❗ Migration crée 'sos_alertes' (avec underscore simple)
     protected $table = 'sos_alertes';
 
     protected $fillable = [

@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Inertia\Inertia;
-
 class ProfileController extends Controller
 {
     public function show()
@@ -17,16 +14,18 @@ class ProfileController extends Controller
                 'prenom'         => $user->prenom,
                 'email'          => $user->email,
                 'telephone'      => $user->telephone ?? null,
-                'date_naissance' => $patient->date_naissance
+                'date_naissance' => $patient?->date_naissance
                     ? \Carbon\Carbon::parse($patient->date_naissance)->format('d/m/Y')
                     : null,
-                'lien'           => $patient->lien,
-                'etat'           => $patient->etat,
-                 'adresse' => $patient->adresse ?? null,
-                'responsable'    => $patient->responsableActif()
+                'lien'           => $patient?->lien ?? null,
+                'etat'           => $patient?->etat ?? null,
+                'adresse'        => $patient?->adresse ?? null,
+                'responsable'    => $patient && $patient->responsableActif()
                     ? $patient->responsableActif()->nom . ' ' . $patient->responsableActif()->prenom
                     : 'Aucun',
             ],
         ]);
+        
     }
+    
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('type');   // rappel | confirmation | alerte | info
             $table->string('titre');
             $table->text('message');
-            $table->json('data')->nullable(); // ex: {dosage_id:1, prise_id:2}
+            $table->json('data')->nullable(); // {dosage_id:1, prise_id:2}
             $table->boolean('lu')->default(false);
             $table->timestamp('lu_at')->nullable();
             $table->timestamps();

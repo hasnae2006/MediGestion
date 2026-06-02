@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('temps', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');   // Matin | Midi | Soir | Coucher
+            $table->string('nom');   // Matin | Midi | Soir |
             $table->time('heure');   // heure par défaut ex: 08:00
             $table->timestamps();
         });

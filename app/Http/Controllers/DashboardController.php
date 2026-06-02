@@ -9,8 +9,7 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    /** Dashboard Responsable */
-    public function responsable()
+     public function responsable()
     {
         $responsable = auth()->user();
         $patientIds  = $responsable->patientsGeres()->wherePivot('actif', true)->pluck('patients.id');
@@ -22,8 +21,8 @@ class DashboardController extends Controller
             'stock_total'       => Medicament::sum('quantite_stock'),
         ];
 
-        // Suivi adhérence globale
-        $totalPrises = PriseMedicament::whereIn('patient_id', $patientIds)
+        
+        $totalPrises = PriseMedicament::whereIn('patient_id', $patientIds)//suivi ADHE
             ->where('date_prevue', '>=', now()->subDays(30))
             ->whereIn('statut', ['pris', 'manque'])->count();
 
@@ -33,8 +32,7 @@ class DashboardController extends Controller
 
         $adherence = $totalPrises > 0 ? round($prisesConfirmees * 100 / $totalPrises) : 0;
 
-        // Prises manquées aujourd'hui
-        $alertes = PriseMedicament::with(['dosage.medicament', 'patient.user'])
+        $alertes = PriseMedicament::with(['dosage.medicament', 'patient.user'])//prises manquant today
             ->whereIn('patient_id', $patientIds)
             ->whereDate('date_prevue', today())
             ->where('statut', 'manque')
@@ -45,12 +43,9 @@ class DashboardController extends Controller
                 'heure'      => substr($p->heure_prevue, 0, 5),
             ]);
 
-        // Stock faible (seuil 10)
-        $stockFaible = Medicament::where('quantite_stock', '<=', 10)
+        $stockFaible = Medicament::where('quantite_stock', '<=', 10)//faibless de stock
             ->orderBy('quantite_stock')
             ->get(['nom_commercial', 'quantite_stock']);
-
-        // Ordonnances actives récentes
         $ordonnances = \App\Models\Ordonnance::with(['patient.user', 'dosages.medicament'])
             ->where('responsable_id', $responsable->id)
             ->where('active', true)
