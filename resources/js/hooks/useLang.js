@@ -1,25 +1,27 @@
-// resources/js/hooks/useLang.js
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+function getStoredLang() {
+    try {
+        return localStorage.getItem('lang') || 'fr';
+    } catch {
+        return 'fr';
+    }
+}
 
 export function useLang() {
-    const [lang, setLang] = useState(localStorage.getItem('lang') || 'fr');
+    const [lang, setLang] = useState(getStoredLang);
 
     useEffect(() => {
-        const handleStorage = () => {
-            setLang(localStorage.getItem('lang') || 'fr');
+        const sync = (event) => {
+            setLang(event.detail || getStoredLang());
         };
 
-        window.addEventListener('storage', handleStorage);
-
-        // Polling toutes les 300ms pour détecter le changement
-        const interval = setInterval(() => {
-            const current = localStorage.getItem('lang') || 'fr';
-            setLang(prev => prev !== current ? current : prev);
-        }, 300);
+        window.addEventListener('app:lang', sync);
+        window.addEventListener('storage', sync);
 
         return () => {
-            window.removeEventListener('storage', handleStorage);
-            clearInterval(interval);
+            window.removeEventListener('app:lang', sync);
+            window.removeEventListener('storage', sync);
         };
     }, []);
 

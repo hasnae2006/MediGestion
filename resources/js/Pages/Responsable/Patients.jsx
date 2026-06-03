@@ -2,51 +2,44 @@ import { useState } from 'react';
 import { useForm, router, usePage } from '@inertiajs/react';
 import AppLayout from '../Layout';
 import { useLang } from '../../hooks/useLang';
-const C = {
-    bgCard:  'rgba(255,255,255,0.07)',
-    blue:    '#818CF8', blueSoft: 'rgba(129,140,248,0.15)',
-    green:   '#34D399', greenSoft: 'rgba(52,211,153,0.15)',
-    red:     '#F87171', redSoft: 'rgba(248,113,113,0.15)',
-    yellow:  '#FBBF24', yellowSoft: 'rgba(251,191,36,0.15)',
-    text:    '#F1F5F9', textMuted: '#94A3B8', textHint: '#475569',
-    border:  'rgba(255,255,255,0.10)', borderLight: 'rgba(255,255,255,0.05)',
-};
 
-const glass = (extra = {}) => ({
-    backgroundColor: C.bgCard,
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    borderRadius: 16,
-    border: `1px solid ${C.border}`,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-    ...extra,
-});
+const cardStyle = {
+    background: 'var(--panel)',
+    border: '1px solid var(--line)',
+    borderRadius: 10,
+    boxShadow: 'var(--shadow)',
+};
 
 const inp = () => ({
     width: '100%', padding: '10px 14px',
-    border: `1.5px solid ${C.border}`,
-    borderRadius: 10, fontSize: 14, boxSizing: 'border-box',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    color: C.text, outline: 'none',
+    border: '1px solid var(--line)',
+    borderRadius: 8, fontSize: 14, boxSizing: 'border-box',
+    background: 'var(--panel-soft)',
+    color: 'var(--text)', outline: 'none',
+    colorScheme: 'dark',
 });
 
 const lbl = {
-    display: 'block', fontSize: 12, fontWeight: 600,
-    color: C.textMuted, marginBottom: 6,
+    display: 'block', fontSize: 12, fontWeight: 800,
+    color: 'var(--muted)', marginBottom: 6,
     textTransform: 'uppercase', letterSpacing: '0.05em',
 };
 
 const th = {
-    textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 700,
-    color: C.textHint, textTransform: 'uppercase', letterSpacing: '0.06em',
-    borderBottom: `1px solid ${C.border}`,
+    textAlign: 'left', padding: '10px 12px', fontSize: 12,
+    color: 'var(--muted)', fontWeight: 800,
+    textTransform: 'uppercase', letterSpacing: '0.05em',
 };
 
 const td = {
-    padding: '12px 16px', fontSize: 14,
-    borderBottom: `1px solid ${C.borderLight}`,
-    verticalAlign: 'middle', color: C.text,
+    padding: '12px', fontSize: 14,
+    borderTop: '1px solid var(--line)',
+    verticalAlign: 'middle', color: 'var(--text)',
 };
+
+const onFocus = e => { e.target.style.borderColor = 'var(--blue)'; };
+const onBlur  = e => { e.target.style.borderColor = 'var(--line)'; };
+
 const text = {
     fr: {
         titre: 'Gestion des patients', nb: 'patient(s) enregistré(s)',
@@ -96,14 +89,15 @@ const text = {
 };
 
 const LIENS = ['fils', 'fille', 'epoux', 'epouse', 'pere', 'mere', 'frere', 'soeur', 'infirmier', 'autre'];
+
 export default function Patients() {
     const { patients = [], medecins = [] } = usePage().props;
     const lang = useLang();
     const t = text[lang] || text.fr;
 
-    const [search, setSearch]           = useState('');
-    const [showAdd, setShowAdd]         = useState(false);
-    const [editPatient, setEditPatient] = useState(null);
+    const [search, setSearch]               = useState('');
+    const [showAdd, setShowAdd]             = useState(false);
+    const [editPatient, setEditPatient]     = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     const addForm  = useForm({ nom: '', prenom: '', email: '', telephone: '', password: '', password_confirmation: '', lien: 'autre', date_naissance: '', medecin_id: '' });
@@ -128,164 +122,166 @@ export default function Patients() {
     return (
         <AppLayout>
             {confirmDelete && (
-                <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={glass({ padding: 32, maxWidth: 400, width: '90%', textAlign: 'center' })}>
-                        <div style={{ fontSize: 48, marginBottom: 12 }}>🗑️</div>
-                        <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 8px', color: C.text }}>{t.confirmer_titre}</h3>
-                        <p style={{ fontSize: 14, color: C.textMuted, marginBottom: 24 }}>
-                            {t.confirmer_msg} <strong style={{ color: C.text }}>{confirmDelete.prenom} {confirmDelete.nom}</strong> {t.confirmer_msg2}
+                <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ ...cardStyle, padding: 32, maxWidth: 400, width: '90%', textAlign: 'center' }}>
+                        <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
+                        <h3 style={{ fontSize: 18, fontWeight: 900, margin: '0 0 8px', color: 'var(--text)' }}>{t.confirmer_titre}</h3>
+                        <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}>
+                            {t.confirmer_msg} <strong style={{ color: 'var(--text)' }}>{confirmDelete.prenom} {confirmDelete.nom}</strong> {t.confirmer_msg2}
                         </p>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                             <button
                                 onClick={() => setConfirmDelete(null)}
-                                style={{ padding: '8px 20px', border: `1px solid ${C.border}`, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)', color: C.textMuted, cursor: 'pointer', fontWeight: 600 }}
+                                style={{ padding: '8px 20px', border: '1px solid var(--line)', borderRadius: 8, background: 'var(--panel-soft)', color: 'var(--muted)', cursor: 'pointer', fontWeight: 800 }}
                             >{t.annuler}</button>
                             <button
                                 onClick={handleDelete}
-                                style={{ padding: '8px 20px', background: 'linear-gradient(135deg,#F87171,#DC2626)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700 }}
+                                style={{ padding: '8px 20px', background: 'var(--red)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 800 }}
                             >{t.retirer}</button>
                         </div>
                     </div>
                 </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <div>
-                    <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: C.text }}>{t.titre}</h1>
-                    <p style={{ fontSize: 14, color: C.textMuted, margin: '4px 0 0' }}>{patients.length} {t.nb}</p>
+                    <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: 'var(--text)' }}>{t.titre}</h1>
+                    <p style={{ margin: '6px 0 0', color: 'var(--muted)', fontSize: 14 }}>{patients.length} {t.nb}</p>
                 </div>
                 <button
                     onClick={() => { setShowAdd(!showAdd); setEditPatient(null); }}
-                    style={{ background: 'linear-gradient(135deg,#818CF8,#6366F1)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', cursor: 'pointer', fontWeight: 700, boxShadow: '0 4px 15px rgba(129,140,248,0.35)' }}
+                    style={{ background: 'var(--blue)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 800, fontSize: 14 }}
                 >
                     {showAdd ? t.fermer : t.ajouter}
                 </button>
-            </div>
+            </header>
             {showAdd && (
-                <div style={glass({ padding: 24, marginBottom: 16, border: '1px solid rgba(52,211,153,0.3)' })}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 20, color: C.text }}>{t.nouveau}</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                <div style={{ ...cardStyle, padding: 20, marginBottom: 16 }}>
+                    <h2 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>{t.nouveau}</h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                         {[[t.nom,'nom'],[t.prenom,'prenom'],[t.email,'email'],[t.telephone,'telephone']].map(([l,k]) => (
                             <div key={k}>
                                 <label style={lbl}>{l}</label>
-                                <input style={inp()} value={addForm.data[k]} onChange={e => addForm.setData(k, e.target.value)} />
+                                <input style={inp()} value={addForm.data[k]} onChange={e => addForm.setData(k, e.target.value)} onFocus={onFocus} onBlur={onBlur} />
                             </div>
                         ))}
                         <div>
                             <label style={lbl}>{t.password}</label>
-                            <input type="password" style={inp()} value={addForm.data.password} onChange={e => addForm.setData('password', e.target.value)} />
+                            <input type="password" style={inp()} value={addForm.data.password} onChange={e => addForm.setData('password', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
                         </div>
                         <div>
                             <label style={lbl}>{t.password_confirm}</label>
-                            <input type="password" style={inp()} value={addForm.data.password_confirmation} onChange={e => addForm.setData('password_confirmation', e.target.value)} />
+                            <input type="password" style={inp()} value={addForm.data.password_confirmation} onChange={e => addForm.setData('password_confirmation', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
                         </div>
                         <div>
                             <label style={lbl}>{t.lien}</label>
-                            <select style={inp()} value={addForm.data.lien} onChange={e => addForm.setData('lien', e.target.value)}>
-                                {LIENS.map(l => <option key={l} style={{ backgroundColor: '#1A1F4E' }}>{l}</option>)}
+                            <select style={inp()} value={addForm.data.lien} onChange={e => addForm.setData('lien', e.target.value)} onFocus={onFocus} onBlur={onBlur}>
+                                {LIENS.map(l => <option key={l}>{l}</option>)}
                             </select>
                         </div>
                         <div>
                             <label style={lbl}>{t.date_naissance}</label>
-                            <input type="date" style={inp()} value={addForm.data.date_naissance} onChange={e => addForm.setData('date_naissance', e.target.value)} />
+                            <input type="date" style={inp()} value={addForm.data.date_naissance} onChange={e => addForm.setData('date_naissance', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
                         </div>
                         <div>
                             <label style={lbl}>{t.medecin}</label>
-                            <select style={inp()} value={addForm.data.medecin_id} onChange={e => addForm.setData('medecin_id', e.target.value)}>
-                                <option value="" style={{ backgroundColor: '#1A1F4E' }}>{t.aucun_medecin}</option>
-                                {medecins.map(m => <option key={m.id} value={m.id} style={{ backgroundColor: '#1A1F4E' }}>Dr. {m.nom} {m.prenom}</option>)}
+                            <select style={inp()} value={addForm.data.medecin_id} onChange={e => addForm.setData('medecin_id', e.target.value)} onFocus={onFocus} onBlur={onBlur}>
+                                <option value="">{t.aucun_medecin}</option>
+                                {medecins.map(m => <option key={m.id} value={m.id}>Dr. {m.nom} {m.prenom}</option>)}
                             </select>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-                        <button onClick={handleAdd} style={{ background: 'linear-gradient(135deg,#818CF8,#6366F1)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 700 }}>{t.enregistrer}</button>
-                        <button onClick={() => setShowAdd(false)} style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: C.textMuted, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 600 }}>{t.annuler}</button>
+                        <button onClick={handleAdd} style={{ background: 'var(--blue)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 800 }}>{t.enregistrer}</button>
+                        <button onClick={() => setShowAdd(false)} style={{ background: 'var(--panel-soft)', color: 'var(--muted)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 800 }}>{t.annuler}</button>
                     </div>
                 </div>
             )}
             {editPatient && (
-                <div style={glass({ padding: 24, marginBottom: 16, border: '1px solid rgba(251,191,36,0.3)' })}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 20, color: C.yellow }}>✏️ — {editPatient.prenom} {editPatient.nom}</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                <div style={{ ...cardStyle, padding: 20, marginBottom: 16, borderLeft: '3px solid var(--amber)' }}>
+                    <h2 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>✏️ {editPatient.prenom} {editPatient.nom}</h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                         {[[t.nom,'nom'],[t.prenom,'prenom'],[t.email,'email'],[t.telephone,'telephone']].map(([l,k]) => (
                             <div key={k}>
                                 <label style={lbl}>{l}</label>
-                                <input style={inp()} value={editForm.data[k]} onChange={e => editForm.setData(k, e.target.value)} />
+                                <input style={inp()} value={editForm.data[k]} onChange={e => editForm.setData(k, e.target.value)} onFocus={onFocus} onBlur={onBlur} />
                             </div>
                         ))}
                         <div>
                             <label style={lbl}>{t.lien}</label>
-                            <select style={inp()} value={editForm.data.lien} onChange={e => editForm.setData('lien', e.target.value)}>
-                                {LIENS.map(l => <option key={l} style={{ backgroundColor: '#1A1F4E' }}>{l}</option>)}
+                            <select style={inp()} value={editForm.data.lien} onChange={e => editForm.setData('lien', e.target.value)} onFocus={onFocus} onBlur={onBlur}>
+                                {LIENS.map(l => <option key={l}>{l}</option>)}
                             </select>
                         </div>
                         <div>
                             <label style={lbl}>État</label>
-                            <select style={inp()} value={editForm.data.etat} onChange={e => editForm.setData('etat', e.target.value)}>
-                                {t.etat_options.map(e => <option key={e} style={{ backgroundColor: '#1A1F4E' }}>{e}</option>)}
+                            <select style={inp()} value={editForm.data.etat} onChange={e => editForm.setData('etat', e.target.value)} onFocus={onFocus} onBlur={onBlur}>
+                                {t.etat_options.map(e => <option key={e}>{e}</option>)}
                             </select>
                         </div>
                         <div>
                             <label style={lbl}>{t.medecin}</label>
-                            <select style={inp()} value={editForm.data.medecin_id} onChange={e => editForm.setData('medecin_id', e.target.value)}>
-                                <option value="" style={{ backgroundColor: '#1A1F4E' }}>{t.aucun_medecin}</option>
-                                {medecins.map(m => <option key={m.id} value={m.id} style={{ backgroundColor: '#1A1F4E' }}>Dr. {m.nom} {m.prenom}</option>)}
+                            <select style={inp()} value={editForm.data.medecin_id} onChange={e => editForm.setData('medecin_id', e.target.value)} onFocus={onFocus} onBlur={onBlur}>
+                                <option value="">{t.aucun_medecin}</option>
+                                {medecins.map(m => <option key={m.id} value={m.id}>Dr. {m.nom} {m.prenom}</option>)}
                             </select>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-                        <button onClick={handleEdit} style={{ background: 'linear-gradient(135deg,#FBBF24,#D97706)', color: '#0F1535', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 700 }}>{t.mettre_a_jour}</button>
-                        <button onClick={() => setEditPatient(null)} style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: C.textMuted, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 600 }}>{t.annuler}</button>
+                        <button onClick={handleEdit} style={{ background: 'var(--amber)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 800 }}>{t.mettre_a_jour}</button>
+                        <button onClick={() => setEditPatient(null)} style={{ background: 'var(--panel-soft)', color: 'var(--muted)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 800 }}>{t.annuler}</button>
                     </div>
                 </div>
             )}
-            <div style={glass({ padding: '12px 16px', marginBottom: 12 })}>
+            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16 }}>
                 <input
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    style={{ ...inp(), marginBottom: 0 }}
+                    style={{ ...inp(), border: 'none', background: 'transparent', padding: 0 }}
                     placeholder={t.recherche}
                 />
             </div>
-            <div style={glass({ overflow: 'hidden', padding: 0 })}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div style={{ ...cardStyle, padding: 20, overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
                     <thead>
-                        <tr style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
+                        <tr>
                             {t.cols.map(h => <th key={h} style={th}>{h}</th>)}
                         </tr>
                     </thead>
                     <tbody>
                         {filtered.map(p => (
-                            <tr
-                                key={p.id}
-                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.035)'}
+                            <tr key={p.id} style={{ borderTop: '1px solid var(--line)' }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--panel-soft)'}
                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                style={{ transition: 'background 0.15s' }}
                             >
                                 <td style={td}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(129,140,248,0.3),rgba(167,139,250,0.3))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👤</div>
-                                        <span style={{ fontWeight: 600 }}>{p.prenom} {p.nom}</span>
+                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(239,68,68,.08)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👤</div>
+                                        <span style={{ fontWeight: 800 }}>{p.prenom} {p.nom}</span>
                                     </div>
                                 </td>
-                                <td style={{ ...td, color: C.textMuted }}>{p.email}</td>
+                                <td style={{ ...td, color: 'var(--muted)' }}>{p.email}</td>
                                 <td style={td}>{p.telephone}</td>
                                 <td style={td}>
-                                    <span style={{ backgroundColor: C.blueSoft, color: C.blue, padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{p.lien}</span>
+                                    <span style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--blue)', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 800 }}>{p.lien}</span>
                                 </td>
                                 <td style={td}>
-                                    <span style={{ backgroundColor: p.etat === 'actif' ? C.greenSoft : C.redSoft, color: p.etat === 'actif' ? C.green : C.red, padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{p.etat}</span>
+                                    <span style={{
+                                        background: p.etat === 'actif' ? 'rgba(20,184,166,0.1)' : p.etat === 'gueri' ? 'rgba(20,184,166,0.1)' : 'rgba(239,68,68,.08)',
+                                        color: p.etat === 'actif' ? 'var(--teal)' : p.etat === 'gueri' ? 'var(--teal)' : 'var(--red)',
+                                        padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 800
+                                    }}>{p.etat}</span>
                                 </td>
                                 <td style={td}>
                                     {p.medecin
                                         ? <div>
-                                            <div style={{ fontWeight: 600, fontSize: 13 }}>Dr. {p.medecin.nom} {p.medecin.prenom}</div>
-                                            <div style={{ color: C.textHint, fontSize: 11 }}>{p.medecin.specialite}</div>
+                                            <div style={{ fontWeight: 800, fontSize: 13 }}>Dr. {p.medecin.nom} {p.medecin.prenom}</div>
+                                            <div style={{ color: 'var(--muted)', fontSize: 11 }}>{p.medecin.specialite}</div>
                                           </div>
-                                        : <span style={{ color: C.textHint, fontSize: 12 }}>{t.non_assigne}</span>
+                                        : <span style={{ color: 'var(--muted)', fontSize: 12 }}>{t.non_assigne}</span>
                                     }
                                 </td>
                                 <td style={td}>
-                                    <span style={{ fontWeight: 700, color: p.adherence >= 80 ? C.green : p.adherence >= 60 ? C.yellow : C.red }}>
+                                    <span style={{ fontWeight: 900, color: p.adherence >= 80 ? 'var(--teal)' : p.adherence >= 60 ? 'var(--amber)' : 'var(--red)' }}>
                                         {p.adherence}%
                                     </span>
                                 </td>
@@ -298,9 +294,12 @@ export default function Patients() {
                     </tbody>
                 </table>
                 {filtered.length === 0 && (
-                    <p style={{ textAlign: 'center', color: C.textMuted, padding: 32 }}>{t.aucun}</p>
+                    <div style={{ padding: 22, textAlign: 'center', color: 'var(--muted)', background: 'var(--panel-soft)', borderRadius: 8, marginTop: 12 }}>
+                        {t.aucun}
+                    </div>
                 )}
             </div>
+
         </AppLayout>
     );
 }
