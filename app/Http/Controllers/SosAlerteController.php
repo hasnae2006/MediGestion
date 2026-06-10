@@ -6,6 +6,7 @@ use App\Http\Requests\StoreSosAlerteRequest;
 use App\Http\Requests\UpdateSosAlerteRequest;
 use App\Models\SosAlerte;
 use App\Models\Notification;
+use App\Models\PriseMedicament;
 use Inertia\Inertia;
 
 class SosAlerteController extends Controller
@@ -15,22 +16,50 @@ class SosAlerteController extends Controller
     {
         $responsable = auth()->user();
 
-        $alertes = SosAlerte::with('patient.user')
+        $alertesSos = SosAlerte::with('patient.user')
             ->where('responsable_id', $responsable->id)
             ->latest()
             ->get()
             ->map(fn($a) => [
                 'id'      => $a->id,
+                'source'  => 'sos',
                 'patient' => $a->patient->nomComplet(),
                 'message' => $a->message,
                 'statut'  => $a->statut,
                 'date'    => $a->created_at->diffForHumans(),
             ]);
 
-        $patients = $responsable->patientsGeres()
+        $patientsCollection = $responsable->patientsGeres()
             ->with('user')
             ->wherePivot('actif', true)
+            ->get();
+
+        $patientIds = $patientsCollection->pluck('id');
+
+        PriseMedicament::whereIn('patient_id', $patientIds)
+            ->whereDate('date_prevue', today())
+            ->where('heure_prevue', '<', now()->format('H:i:s'))
+            ->where('statut', 'en_attente')
+            ->update(['statut' => 'manque']);
+
+        $alertesPrises = PriseMedicament::with(['patient.user', 'dosage.medicament'])
+            ->whereIn('patient_id', $patientIds)
+            ->whereDate('date_prevue', today())
+            ->where('statut', 'manque')
+            ->orderByDesc('heure_prevue')
             ->get()
+            ->map(fn($prise) => [
+                'id'      => 'prise-'.$prise->id,
+                'source'  => 'prise',
+                'patient' => $prise->patient->nomComplet(),
+                'message' => 'Prise manquee: '.$prise->dosage->medicament->nom_commercial.' a '.substr((string) $prise->heure_prevue, 0, 5),
+                'statut'  => 'envoye',
+                'date'    => "Aujourd'hui",
+            ]);
+
+        $alertes = $alertesSos->concat($alertesPrises)->values();
+
+        $patients = $patientsCollection
             ->map(fn($p) => [
                 'id'     => $p->id,
                 'nom'    => $p->user->nom,
@@ -85,7 +114,7 @@ class SosAlerteController extends Controller
                 'type'    => 'alerte',
                 'titre'   => '🆘 ALERTE SOS - ' . $patient->nomComplet(),
                 'message' => $data['message'],
-                'lue'     => false,
+                'lu'      => false,
                 'data'    => [
                     'patient_id' => $patient->id,
                     'sos_alerte_id' => $sosAlerte->id
@@ -103,6 +132,8 @@ class SosAlerteController extends Controller
     }
     public function update(UpdateSosAlerteRequest $request, SosAlerte $sosAlerte)
     {
+        abort_unless($sosAlerte->responsable_id === auth()->id(), 403);
+
         $data = $request->validated();
 
         $sosAlerte->update($data);

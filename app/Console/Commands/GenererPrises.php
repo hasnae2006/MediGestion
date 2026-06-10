@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class GenererPrises extends Command
 {
-    protected $signature = 'prises:generer';
+    protected $signature = 'prises:generer {--from= : Date de debut des prises a generer (YYYY-MM-DD ou today)}';
     protected $description = 'Génère les prises depuis les ordonnances actives';
 
     public function handle()
@@ -18,8 +18,13 @@ class GenererPrises extends Command
         $tempsIds = [1, 2, 4];
         $temps = Temp::whereIn('id', $tempsIds)->get();
 
-        Dosage::with('ordonnance')->get()->each(function($dosage) use ($temps) {
-            $debut = Carbon::parse($dosage->ordonnance->date_prescription);
+        $from = $this->option('from');
+        $forcedStart = $from
+            ? ($from === 'today' ? today() : Carbon::parse($from))
+            : null;
+
+        Dosage::with('ordonnance')->get()->each(function($dosage) use ($temps, $forcedStart) {
+            $debut = $forcedStart?->clone() ?? Carbon::parse($dosage->ordonnance->date_prescription);
             $jours = match($dosage->duree_unite) {
                 'semaines' => $dosage->duree * 7,
                 'mois'     => $dosage->duree * 30,

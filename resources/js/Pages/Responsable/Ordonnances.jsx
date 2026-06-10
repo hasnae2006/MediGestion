@@ -10,6 +10,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const inputStyle = (hasError = false) => ({
     width: '100%', padding: '10px 14px',
     border: hasError ? '1.5px solid var(--red)' : '1px solid var(--line)',
@@ -179,7 +189,13 @@ export default function Ordonnances({ ordonnances = [], patients = [], medicamen
     const [form, setForm]           = useState(emptyForm);
     const [formDosages, setFormDosages] = useState([{ ...emptyDosage }]);
 
-    const patientOptions = useMemo(() => patients.map(p => ({ id: p.id, label: `${p.prenom} ${p.nom}` })), [patients]);
+    const patientOptions = useMemo(() => patients.map(p => {
+        const prenom = p.prenom ?? p.user?.prenom ?? '';
+        const nom = p.nom ?? p.user?.nom ?? '';
+        const label = `${prenom} ${nom}`.trim() || `Patient #${p.id}`;
+
+        return { id: p.id, label };
+    }), [patients]);
 
     const resetAdd = () => { setShowAdd(false); setForm(emptyForm); setFormDosages([{ ...emptyDosage }]); };
 
@@ -207,7 +223,7 @@ export default function Ordonnances({ ordonnances = [], patients = [], medicamen
 
     return (
         <AppLayout>
-            <div style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            <div style={{ ...pageStyle, direction: isRtl ? 'rtl' : 'ltr' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, marginBottom: 24 }}>
                     <div>
                         <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.title}</h1>
@@ -257,7 +273,6 @@ export default function Ordonnances({ ordonnances = [], patients = [], medicamen
                         </div>
                     )}
                 </div>
-            </div>
 
             {showAdd && (
                 <div onClick={resetAdd} style={modalOuter}>
@@ -320,6 +335,7 @@ export default function Ordonnances({ ordonnances = [], patients = [], medicamen
                     </div>
                 </div>
             )}
+            </div>
         </AppLayout>
     );
 }

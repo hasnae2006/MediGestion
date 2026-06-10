@@ -70,7 +70,9 @@ class PriseMedicamentController extends Controller
     public function historique()
     {
         $responsable = auth()->user();
-        $patientIds  = $responsable->patientsGeres()->pluck('patients.id');
+        $patientIds  = $responsable->patientsGeres()
+            ->wherePivot('actif', true)
+            ->pluck('patients.id');
 
         $prises = PriseMedicament::with(['dosage.medicament', 'patient.user', 'temps'])
             ->whereIn('patient_id', $patientIds)

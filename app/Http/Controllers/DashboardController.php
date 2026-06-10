@@ -18,6 +18,12 @@ class DashboardController extends Controller
             ->wherePivot('actif', true)
             ->pluck('patients.id');
 
+        PriseMedicament::whereIn('patient_id', $patientIds)
+            ->whereDate('date_prevue', today())
+            ->where('heure_prevue', '<', now()->format('H:i:s'))
+            ->where('statut', 'en_attente')
+            ->update(['statut' => 'manque']);
+
         $stats = [
             'patients' => $patientIds->count(),
             'ordonnances_actives' => Ordonnance::where('responsable_id', $responsable->id)

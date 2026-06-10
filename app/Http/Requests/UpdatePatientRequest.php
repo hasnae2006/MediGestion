@@ -20,9 +20,10 @@ class UpdatePatientRequest extends FormRequest
             'nom' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
             'prenom' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'-]+$/u'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($patient?->user_id)],
-            'telephone' => ['required', 'string', 'regex:/^(\+212|0)[5-7][0-9]{8}$/'],
+            'telephone' => ['required', 'string', 'min:6', 'max:20', 'regex:/^[0-9+\s().-]+$/'],
             'lien' => ['required', 'in:fils,fille,epoux,epouse,pere,mere,frere,soeur,infirmier,autre'],
             'etat' => ['required', 'in:actif,inactif,gueri'],
+            'adresse' => ['nullable', 'string', 'max:255'],
             'date_naissance' => ['nullable', 'date', 'before:today'],
             'medecin_id' => ['nullable', 'exists:medecins,id'],
         ];

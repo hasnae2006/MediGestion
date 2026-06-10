@@ -10,6 +10,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const inp = (err = false) => ({
     width: '100%', padding: '10px 14px',
     border: err ? '1.5px solid var(--red)' : '1px solid var(--line)',
@@ -77,6 +87,7 @@ export default function ProfilResponsable({ profil }) {
 
     return (
         <AppLayout>
+            <div style={pageStyle}>
             {success && (
                 <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 9999, background: 'var(--teal)', color: '#fff', borderRadius: 10, padding: '12px 20px', fontWeight: 800, fontSize: 14, boxShadow: 'var(--shadow)' }}>✓ {t.succes}</div>
             )}
@@ -121,6 +132,7 @@ export default function ProfilResponsable({ profil }) {
                         </button>
                     )}
                 </div>
+            </div>
             </div>
         </AppLayout>
     );

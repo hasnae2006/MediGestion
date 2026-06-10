@@ -70,7 +70,7 @@ class MedicamentController extends Controller
     public function reapprovisionner(ReapprovisionnerMedicamentRequest $request, Medicament $medicament)
     {
         $data = $request->validated();
-        $medicament->increment('quantite_stock', $data['quantite']);
+        $medicament->increment('quantite_stock', $data['quantite']);//pivot
 
         return redirect()->back()->with('success', 'Stock mis à jour.');
     }

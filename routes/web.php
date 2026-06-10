@@ -33,6 +33,7 @@ Route::middleware(['auth', 'role:responsable'])
         Route::get('profil', [ResponsableController::class, 'profil'])->name('profil');
         Route::put('profil', [ResponsableController::class, 'updateProfil'])->name('profil.update');
         Route::resource('patients', PatientController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('patients/{patient}/programme', [PatientController::class, 'sendProgramme'])->name('patients.programme');
         Route::resource('ordonnances', OrdonnanceController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('medicaments', MedicamentController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('medicaments/{medicament}/stock', [MedicamentController::class, 'reapprovisionner'])->name('medicaments.stock');

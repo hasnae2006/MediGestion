@@ -40,7 +40,17 @@ export default function Notifications({ notifications = [] }) {
 
     return (
         <AppLayout>
-            <div style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            {/* ✅ Wrapper scrollable */}
+            <div style={{
+                height: '100vh',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                padding: '24px',
+                boxSizing: 'border-box',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'var(--line) transparent',
+                direction: isRtl ? 'rtl' : 'ltr',
+            }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                     <div>
                         <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.titre}</h1>
@@ -129,7 +139,7 @@ export default function Notifications({ notifications = [] }) {
                         })}
                     </div>
                 )}
-            </div>
+            </div>{/* fin wrapper scrollable */}
         </AppLayout>
     );
 }

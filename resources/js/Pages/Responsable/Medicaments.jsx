@@ -10,6 +10,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const inputStyle = (hasError = false) => ({
     width: '100%', padding: '10px 14px',
     border: hasError ? '1.5px solid var(--red)' : '1px solid var(--line)',
@@ -99,6 +109,7 @@ export default function Medicaments({ medicaments = [] }) {
 
     return (
         <AppLayout>
+            <div style={pageStyle}>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <div>
                     <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.titre}</h1>
@@ -209,6 +220,7 @@ export default function Medicaments({ medicaments = [] }) {
                     </div>
                 </div>
             )}
+            </div>
         </AppLayout>
     );
 }

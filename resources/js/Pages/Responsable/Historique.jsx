@@ -9,6 +9,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const th = {
     textAlign: 'left', padding: '10px 12px', fontSize: 12,
     color: 'var(--muted)', fontWeight: 800,
@@ -41,6 +51,7 @@ export default function Historique({ prises = { data: [], total: 0 } }) {
 
     return (
         <AppLayout>
+            <div style={pageStyle}>
             <header style={{ marginBottom: 24 }}>
                 <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.titre}</h1>
                 <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 6 }}>{prises?.total || 0} {t.prise}</p>
@@ -81,6 +92,7 @@ export default function Historique({ prises = { data: [], total: 0 } }) {
                         })}
                     </tbody>
                 </table>
+            </div>
             </div>
         </AppLayout>
     );

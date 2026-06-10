@@ -9,6 +9,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const lbl = {
     display: 'block', fontSize: 12, fontWeight: 800,
     color: 'var(--muted)', marginBottom: 6,
@@ -290,6 +300,7 @@ export default function Sos() {
 
     return (
         <AppLayout>
+            <div style={pageStyle}>
             <div style={{ direction: isRtl ? 'rtl' : 'ltr', maxWidth: 660, margin: '0 auto' }}>
                 <header style={{ marginBottom: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
@@ -329,6 +340,7 @@ export default function Sos() {
                         t={t}
                     />
                 )}
+            </div>
             </div>
         </AppLayout>
     );

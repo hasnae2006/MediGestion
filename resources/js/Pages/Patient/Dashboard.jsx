@@ -71,6 +71,7 @@ const text = {
 };
 
 const formeIcon = { comprime: '💊', sirop: '🧴', injectable: '💉', capsule: '🔵', autre: '💊' };
+
 function StatutBadge({ statut, t }) {
     const styles = {
         pris:       { bg: 'rgba(20,184,166,0.1)',  color: 'var(--teal)',  icon: '✓' , label: t.pris       },
@@ -89,6 +90,7 @@ function StatutBadge({ statut, t }) {
         </span>
     );
 }
+
 function ProgressBar({ value }) {
     const color = value >= 80 ? 'var(--teal)' : value >= 60 ? 'var(--amber)' : 'var(--red)';
     return (
@@ -102,6 +104,7 @@ function ProgressBar({ value }) {
         </div>
     );
 }
+
 function Modal({ med, onClose, onConfirm, t }) {
     if (!med) return null;
     const rows = [
@@ -169,6 +172,7 @@ function Modal({ med, onClose, onConfirm, t }) {
         </div>
     );
 }
+
 export default function PatientDashboard() {
     const { auth, prises: prisesInitiales = [], adherence = 0, medecin = null, prochainePrise = null } = usePage().props;
     const lang = useLang();
@@ -205,155 +209,173 @@ export default function PatientDashboard() {
 
     return (
         <AppLayout>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-                <div>
-                    <h1 style={{ fontSize: 30, fontWeight: 900, color: 'var(--text)', margin: 0 }}>
-                        {t.bonjour} {user?.prenom}
-                    </h1>
-                    <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 4 }}>{t.programme}</p>
-                    {prochainePrise && (
-                        <div style={{
-                            marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 8,
-                            background: 'rgba(45,108,223,0.1)', border: '1px solid var(--line)',
-                            borderRadius: 8, padding: '6px 12px', fontSize: 12, color: 'var(--blue)',
-                            fontWeight: 800,
-                        }}>
-                            ⏰ {t.prochaine} <strong>{prochainePrise.heure_prevue}</strong> — {prochainePrise.medicament}
-                        </div>
-                    )}
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', textTransform: 'capitalize', marginBottom: 8 }}>{dateStr}</div>
-                    <button onClick={() => router.visit('/patient/sos')} style={{
-                        background: 'var(--red)', color: '#fff',
-                        border: 'none', borderRadius: 8,
-                        padding: '10px 20px', fontWeight: 900, fontSize: 13,
-                        cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
-                    }}>
-                        🆘 {t.sos}
-                    </button>
-                </div>
-            </header>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-                {stats.map((s, i) => (
-                    <div key={i} style={{ ...cardStyle, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{
-                            width: 44, height: 44, borderRadius: 10,
-                            background: s.bg, display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', fontSize: 20, flexShrink: 0,
-                        }}>{s.icon}</div>
-                        <div>
-                            <div style={{ fontSize: 28, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.n}</div>
-                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text)', marginTop: 3 }}>{s.label}</div>
-                            <div style={{ fontSize: 11, color: 'var(--muted)' }}>{s.sub}</div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 18 }}>
-                <div style={{ ...cardStyle, padding: 22 }}>
-                    <h2 style={{ fontSize: 15, fontWeight: 900, color: 'var(--text)', margin: '0 0 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        📋 {t.programme_jour}
-                    </h2>
-
-                    {prisesState.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--muted)' }}>
-                            <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
-                            <p style={{ fontSize: 13 }}>{t.aucune_prise}</p>
-                        </div>
-                    )}
-
-                    {prisesState.map((p, i) => (
-                        <div key={p.id} style={{
-                            display: 'flex', alignItems: 'center', gap: 12,
-                            padding: '13px 0',
-                            borderBottom: i < prisesState.length - 1 ? '1px solid var(--line)' : 'none',
-                        }}>
-                            <div style={{ minWidth: 48, fontSize: 12, fontWeight: 800, color: 'var(--blue)' }}>{p.heure_prevue}</div>
+            {/* ✅ Wrapper scrollable */}
+            <div style={{
+                height: '100vh',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                padding: '24px',
+                boxSizing: 'border-box',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'var(--line) transparent',
+            }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                    <div>
+                        <h1 style={{ fontSize: 30, fontWeight: 900, color: 'var(--text)', margin: 0 }}>
+                            {t.bonjour} {user?.prenom}
+                        </h1>
+                        <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 4 }}>{t.programme}</p>
+                        {prochainePrise && (
                             <div style={{
-                                width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                                background: p.statut === 'pris' ? 'var(--teal)' : p.statut === 'en_attente' ? 'var(--amber)' : 'var(--muted)',
-                            }} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div
-                                    style={{ fontSize: 13, fontWeight: 800, color: 'var(--blue)', cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                    onClick={() => setSelectedMed(p)}
-                                >{p.medicament}</div>
-                                <div style={{ fontSize: 11, color: 'var(--muted)' }}>{p.quantite} · {p.temps}</div>
+                                marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 8,
+                                background: 'rgba(45,108,223,0.1)', border: '1px solid var(--line)',
+                                borderRadius: 8, padding: '6px 12px', fontSize: 12, color: 'var(--blue)',
+                                fontWeight: 800,
+                            }}>
+                                ⏰ {t.prochaine} <strong>{prochainePrise.heure_prevue}</strong> — {prochainePrise.medicament}
                             </div>
-                            <StatutBadge statut={p.statut} t={t} />
-                            {p.statut === 'en_attente' && (
-                                <button onClick={() => confirmerPrise(p.id)} style={{
-                                    background: 'var(--teal)', color: '#fff',
-                                    border: 'none', borderRadius: 8,
-                                    padding: '6px 14px', fontWeight: 800, fontSize: 12,
-                                    cursor: 'pointer', flexShrink: 0,
-                                }}>
-                                    {t.confirmer}
-                                </button>
-                            )}
+                        )}
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: 12, color: 'var(--muted)', textTransform: 'capitalize', marginBottom: 8 }}>{dateStr}</div>
+                        <button onClick={() => router.visit('/patient/sos')} style={{
+                            background: 'var(--red)', color: '#fff',
+                            border: 'none', borderRadius: 8,
+                            padding: '10px 20px', fontWeight: 900, fontSize: 13,
+                            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+                        }}>
+                            🆘 {t.sos}
+                        </button>
+                    </div>
+                </header>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+                    {stats.map((s, i) => (
+                        <div key={i} style={{ ...cardStyle, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 10,
+                                background: s.bg, display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', fontSize: 20, flexShrink: 0,
+                            }}>{s.icon}</div>
+                            <div>
+                                <div style={{ fontSize: 28, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.n}</div>
+                                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text)', marginTop: 3 }}>{s.label}</div>
+                                <div style={{ fontSize: 11, color: 'var(--muted)' }}>{s.sub}</div>
+                            </div>
                         </div>
                     ))}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <div style={{ ...cardStyle, padding: 20 }}>
-                        <h3 style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                            📊 {t.adherence}
-                        </h3>
-                        <div style={{
-                            fontSize: 34, fontWeight: 900, lineHeight: 1, marginBottom: 10,
-                            color: adherence >= 80 ? 'var(--teal)' : adherence >= 60 ? 'var(--amber)' : 'var(--red)',
-                        }}>{adherence}%</div>
-                        <ProgressBar value={adherence} />
-                        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
-                            {adherence >= 80 ? `✨ ${t.excellent}` : adherence >= 60 ? `⚠️ ${t.efforts}` : `❌ ${t.pensez}`}
-                        </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 18 }}>
+                    {/* ✅ Liste des prises avec scroll interne */}
+                    <div style={{ ...cardStyle, padding: 22, maxHeight: '55vh', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: 'var(--line) transparent' }}>
+                        <h2 style={{ fontSize: 15, fontWeight: 900, color: 'var(--text)', margin: '0 0 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            📋 {t.programme_jour}
+                        </h2>
+
+                        {prisesState.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--muted)' }}>
+                                <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
+                                <p style={{ fontSize: 13 }}>{t.aucune_prise}</p>
+                            </div>
+                        )}
+
+                        {prisesState.map((p, i) => (
+                            <div key={p.id} style={{
+                                display: 'flex', alignItems: 'center', gap: 12,
+                                padding: '13px 0',
+                                borderBottom: i < prisesState.length - 1 ? '1px solid var(--line)' : 'none',
+                            }}>
+                                <div style={{ minWidth: 48, fontSize: 12, fontWeight: 800, color: 'var(--blue)' }}>{p.heure_prevue}</div>
+                                <div style={{
+                                    width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                                    background: p.statut === 'pris' ? 'var(--teal)' : p.statut === 'en_attente' ? 'var(--amber)' : 'var(--muted)',
+                                }} />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div
+                                        style={{ fontSize: 13, fontWeight: 800, color: 'var(--blue)', cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                        onClick={() => setSelectedMed(p)}
+                                    >{p.medicament}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--muted)' }}>{p.quantite} · {p.temps}</div>
+                                </div>
+                                <StatutBadge statut={p.statut} t={t} />
+                                {p.statut === 'en_attente' && (
+                                    <button onClick={() => confirmerPrise(p.id)} style={{
+                                        background: 'var(--teal)', color: '#fff',
+                                        border: 'none', borderRadius: 8,
+                                        padding: '6px 14px', fontWeight: 800, fontSize: 12,
+                                        cursor: 'pointer', flexShrink: 0,
+                                    }}>
+                                        {t.confirmer}
+                                    </button>
+                                )}
+                            </div>
+                        ))}
                     </div>
-                    {medecin ? (
+
+                    {/* Sidebar droite */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         <div style={{ ...cardStyle, padding: 20 }}>
-                            <h3 style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                🩺 {t.mon_medecin}
+                            <h3 style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                📊 {t.adherence}
                             </h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                                <div style={{
-                                    width: 40, height: 40, borderRadius: '50%',
-                                    background: 'rgba(45,108,223,0.1)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                                }}>👨‍⚕️</div>
-                                <div>
-                                    <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)' }}>Dr. {medecin.nom} {medecin.prenom}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--muted)' }}>{medecin.specialite}</div>
+                            <div style={{
+                                fontSize: 34, fontWeight: 900, lineHeight: 1, marginBottom: 10,
+                                color: adherence >= 80 ? 'var(--teal)' : adherence >= 60 ? 'var(--amber)' : 'var(--red)',
+                            }}>{adherence}%</div>
+                            <ProgressBar value={adherence} />
+                            <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
+                                {adherence >= 80 ? `✨ ${t.excellent}` : adherence >= 60 ? `⚠️ ${t.efforts}` : `❌ ${t.pensez}`}
+                            </p>
+                        </div>
+
+                        {medecin ? (
+                            <div style={{ ...cardStyle, padding: 20 }}>
+                                <h3 style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    🩺 {t.mon_medecin}
+                                </h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                                    <div style={{
+                                        width: 40, height: 40, borderRadius: '50%',
+                                        background: 'rgba(45,108,223,0.1)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                                    }}>👨‍⚕️</div>
+                                    <div>
+                                        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text)' }}>Dr. {medecin.nom} {medecin.prenom}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--muted)' }}>{medecin.specialite}</div>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    <div style={{
+                                        background: 'var(--panel-soft)', border: '1px solid var(--line)',
+                                        borderRadius: 8, padding: '8px 12px',
+                                        fontSize: 12, color: 'var(--muted)',
+                                        display: 'flex', alignItems: 'center', gap: 8,
+                                    }}>
+                                        📞 {medecin.telephone}
+                                    </div>
+                                    <a href={`tel:${medecin.telephone}`} style={{
+                                        background: 'rgba(239,68,68,.08)', border: '1px solid var(--line)',
+                                        borderRadius: 8, padding: '9px 12px',
+                                        fontSize: 12, fontWeight: 800, color: 'var(--red)',
+                                        textDecoration: 'none', display: 'flex',
+                                        alignItems: 'center', justifyContent: 'center', gap: 6,
+                                    }}>
+                                        🚨 {t.appel_urgence}
+                                    </a>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                <div style={{
-                                    background: 'var(--panel-soft)', border: '1px solid var(--line)',
-                                    borderRadius: 8, padding: '8px 12px',
-                                    fontSize: 12, color: 'var(--muted)',
-                                    display: 'flex', alignItems: 'center', gap: 8,
-                                }}>
-                                    📞 {medecin.telephone}
-                                </div>
-                                <a href={`tel:${medecin.telephone}`} style={{
-                                    background: 'rgba(239,68,68,.08)', border: '1px solid var(--line)',
-                                    borderRadius: 8, padding: '9px 12px',
-                                    fontSize: 12, fontWeight: 800, color: 'var(--red)',
-                                    textDecoration: 'none', display: 'flex',
-                                    alignItems: 'center', justifyContent: 'center', gap: 6,
-                                }}>
-                                    🚨 {t.appel_urgence}
-                                </a>
+                        ) : (
+                            <div style={{ ...cardStyle, padding: 20, textAlign: 'center' }}>
+                                <div style={{ fontSize: 30, marginBottom: 8 }}>🩺</div>
+                                <p style={{ fontSize: 12, color: 'var(--muted)' }}>{t.aucun_medecin}</p>
                             </div>
-                        </div>
-                    ) : (
-                        <div style={{ ...cardStyle, padding: 20, textAlign: 'center' }}>
-                            <div style={{ fontSize: 30, marginBottom: 8 }}>🩺</div>
-                            <p style={{ fontSize: 12, color: 'var(--muted)' }}>{t.aucun_medecin}</p>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-            <Modal med={selectedMed} onClose={() => setSelectedMed(null)} onConfirm={confirmerPrise} t={t} />
+
+                <Modal med={selectedMed} onClose={() => setSelectedMed(null)} onConfirm={confirmerPrise} t={t} />
+            </div>{/* fin wrapper scrollable */}
         </AppLayout>
     );
 }

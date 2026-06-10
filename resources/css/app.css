@@ -92,9 +92,9 @@ a {
 
 /* ── Main ─────────────────────────────────────────────────── */
 .app-main {
-    min-height: 100vh;
+    height: 100vh;
     margin-left: 248px;
-    padding: 28px;
+    overflow: hidden;
 }
 
 [dir="rtl"] .app-main {
@@ -389,7 +389,6 @@ a {
     .app-main,
     [dir="rtl"] .app-main {
         margin: 0;
-        padding: 18px;
     }
 
     .app-shell { display: block; }

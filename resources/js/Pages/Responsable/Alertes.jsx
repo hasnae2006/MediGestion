@@ -10,6 +10,16 @@ const cardStyle = {
     boxShadow: 'var(--shadow)',
 };
 
+const pageStyle = {
+    height: '100vh',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '24px',
+    boxSizing: 'border-box',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--line) transparent',
+};
+
 const inp = () => ({
     width: '100%', padding: '10px 14px',
     border: '1px solid var(--line)',
@@ -49,6 +59,7 @@ export default function Alertes({ alertes = [], patients = [] }) {
 
     return (
         <AppLayout>
+            <div style={pageStyle}>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <div>
                     <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.titre}</h1>
@@ -113,6 +124,7 @@ export default function Alertes({ alertes = [], patients = [] }) {
                                     </div>
                                     <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>{a.message}</p>
                                 </div>
+                                {a.source !== 'prise' && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
                                     {a.statut === 'envoye' && (
                                         <button onClick={() => marquer(a.id, 'lu')} style={{ background: 'rgba(99,102,241,0.1)', color: 'var(--blue)', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>{t.marquer_lu}</button>
@@ -121,11 +133,13 @@ export default function Alertes({ alertes = [], patients = [] }) {
                                         <button onClick={() => marquer(a.id, 'traite')} style={{ background: 'rgba(20,184,166,0.1)', color: 'var(--teal)', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>{t.traite}</button>
                                     )}
                                 </div>
+                                )}
                             </div>
                         );
                     })}
                 </div>
             )}
+            </div>
         </AppLayout>
     );
 }

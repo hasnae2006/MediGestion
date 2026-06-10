@@ -170,7 +170,7 @@ export default function Register({ responsables = [] }) {
                                     <input
                                         value={data.nom}
                                         onChange={(event) => setData('nom', event.target.value)}
-                                        pattern="[A-Za-zÀ-ÿ\u0600-\u06FF\s'-]{2,100}"
+                                        pattern="[A-Za-z\u00C0-\u00FF\u0600-\u06FF\s\x27-]{2,100}"
                                         required
                                     />
                                 </Field>
@@ -179,7 +179,7 @@ export default function Register({ responsables = [] }) {
                                     <input
                                         value={data.prenom}
                                         onChange={(event) => setData('prenom', event.target.value)}
-                                        pattern="[A-Za-zÀ-ÿ\u0600-\u06FF\s'-]{2,100}"
+                                        pattern="[A-Za-z\u00C0-\u00FF\u0600-\u06FF\s\x27-]{2,100}"
                                         required
                                     />
                                 </Field>

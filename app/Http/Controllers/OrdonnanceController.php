@@ -36,7 +36,16 @@ class OrdonnanceController extends Controller
                 ]),
             ]);
 
-        $patients = $responsable->patientsGeres()->with('user')->wherePivot('actif', true)->get();
+        $patients = $responsable->patientsGeres()
+            ->with('user')
+            ->wherePivot('actif', true)
+            ->orderBy('patients.created_at', 'desc')
+            ->get()
+            ->map(fn ($patient) => [
+                'id' => $patient->id,
+                'nom' => $patient->user?->nom,
+                'prenom' => $patient->user?->prenom,
+            ]);
         $medicaments = Medicament::orderBy('nom_commercial')->get();
         $temps = Temp::all();
 
@@ -46,6 +55,7 @@ class OrdonnanceController extends Controller
     public function store(StoreOrdonnanceRequest $request)
     {
         $data = $request->validated();
+        $this->authorizePatientForResponsable((int) $data['patient_id']);
 
         $ordonnance = Ordonnance::create([
             'patient_id' => $data['patient_id'],
@@ -74,6 +84,8 @@ class OrdonnanceController extends Controller
 
     public function update(UpdateOrdonnanceRequest $request, Ordonnance $ordonnance)
     {
+        $this->authorizeOrdonnanceForResponsable($ordonnance);
+
         $ordonnance->update($request->validated());
 
         return redirect()->back()->with('success', 'Ordonnance mise a jour.');
@@ -81,8 +93,26 @@ class OrdonnanceController extends Controller
 
     public function destroy(Ordonnance $ordonnance)
     {
+        $this->authorizeOrdonnanceForResponsable($ordonnance);
+
         $ordonnance->delete();
 
         return redirect()->back()->with('success', 'Ordonnance supprimee.');
+    }
+
+    private function authorizePatientForResponsable(int $patientId): void
+    {
+        $isManaged = auth()->user()
+            ->patientsGeres()
+            ->where('patients.id', $patientId)
+            ->wherePivot('actif', true)
+            ->exists();
+
+        abort_unless($isManaged, 403);
+    }
+
+    private function authorizeOrdonnanceForResponsable(Ordonnance $ordonnance): void
+    {
+        abort_unless($ordonnance->responsable_id === auth()->id(), 403);
     }
 }

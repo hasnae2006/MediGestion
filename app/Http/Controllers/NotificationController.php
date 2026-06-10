@@ -2,8 +2,6 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\SendNotificationRequest;
 use App\Models\Notification;
-use App\Models\Patient;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class NotificationController extends Controller
@@ -32,6 +30,8 @@ class NotificationController extends Controller
 
     public function destroy(Notification $notification)
     {
+        abort_unless($notification->user_id === auth()->id(), 403);
+
         $notification->delete();
         return redirect()->back()->with('success', 'Notification supprimée.');
     }
@@ -40,7 +40,12 @@ class NotificationController extends Controller
     {
         $data = $request->validated();
 
-        $patient = Patient::with('user')->findOrFail($data['patient_id']);
+        $patient = auth()->user()
+            ->patientsGeres()
+            ->with('user')
+            ->where('patients.id', $data['patient_id'])
+            ->wherePivot('actif', true)
+            ->firstOrFail();
 
         Notification::create([
             'user_id' => $patient->user_id,

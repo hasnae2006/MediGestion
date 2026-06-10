@@ -66,7 +66,17 @@ export default function Profil({ profil }) {
 
     return (
         <AppLayout>
-            <div style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            {/* ✅ Wrapper scrollable */}
+            <div style={{
+                height: '100vh',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                padding: '24px',
+                boxSizing: 'border-box',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'var(--line) transparent',
+                direction: isRtl ? 'rtl' : 'ltr',
+            }}>
                 <header style={{ marginBottom: 24 }}>
                     <h1 style={{ fontSize: 30, fontWeight: 900, margin: 0, color: 'var(--text)' }}>{t.titre}</h1>
                     <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>{t.sous_titre}</p>
@@ -177,10 +187,9 @@ export default function Profil({ profil }) {
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
+            </div>{/* fin wrapper scrollable */}
         </AppLayout>
     );
 }
